@@ -85,10 +85,10 @@ node server.js
 ## 🏫 授業で使うとき (Codespaces)
 
 1. このリポジトリを自分のアカウントに **Fork** し、Fork 先で Codespace を作成します。
-2. 起動すると `npm ci` とサーバー起動が自動で行われます。
+2. 起動すると `npm ci` が自動で行われます（サーバーは**自動では起動しません**）。下のパネルの「ターミナル」で `npm start` を実行してください。このターミナルはサーバーが動いている間、使い続けます。ほかの作業は、ターミナル右上の「＋」で新しいターミナルを開いて行います。
 3. 「PORTS」タブで、ポート 8000 の「表示範囲（Visibility）」は最初 **Private** です。**必ず手動で Public に変更します**（8000 を右クリック → 「Port Visibility」 → 「Public」。`devcontainer.json` では Public に設定できません）。ターミナルなら `gh codespace ports visibility 8000:public` でも変更できます。
 4. **Public は URL を知っていれば誰でも開ける**ので、個人情報は入力しないでください。
-5. サーバーを止めてしまったら、ターミナルで `npm start` を実行します。ログは `/tmp/server.log` です。
+5. サーバーを止めてしまったら、もう一度 `npm start` を実行します。Codespace を停止して再開したときも、`npm start` を実行し直します。
 6. Codespace を再開したときに表示範囲が **Private** に戻っていたら、もう一度 Public に変更します。
 
 ### agy で改造するときのコツ
