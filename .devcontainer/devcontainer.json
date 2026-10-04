@@ -9,6 +9,7 @@
             "visibility": "public"
         }
     },
-    "postStartCommand": "npm start",
+    "postCreateCommand": "npm ci",
+    "postStartCommand": "nohup npm start > /tmp/server.log 2>&1 &",
     "remoteUser": "node"
 }

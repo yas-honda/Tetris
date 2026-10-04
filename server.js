@@ -56,7 +56,10 @@ const server = http.createServer((req, res) => {
 });
 
 // WebSocket Server
-const wss = new WebSocketServer({ server });
+// 公開ポートは誰でも接続できるため、1通のサイズと送信頻度に上限を設ける
+const MAX_PAYLOAD_BYTES = 64 * 1024;
+const MAX_MESSAGES_PER_SECOND = 100;
+const wss = new WebSocketServer({ server, maxPayload: MAX_PAYLOAD_BYTES });
 
 const rooms = new Map();
 
@@ -84,7 +87,20 @@ wss.on('connection', (ws) => {
         ws.isAlive = true;
     });
 
+    // 上限超過などの通信エラーでサーバー全体が落ちないよう、接続ごとに受け止める
+    ws.on('error', () => {});
+
+    ws.windowStart = Date.now();
+    ws.windowCount = 0;
+
     ws.on('message', (message) => {
+        const now = Date.now();
+        if (now - ws.windowStart >= 1000) {
+            ws.windowStart = now;
+            ws.windowCount = 0;
+        }
+        if (++ws.windowCount > MAX_MESSAGES_PER_SECOND) return;
+
         let msg;
         try {
             msg = JSON.parse(message);
