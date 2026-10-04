@@ -443,62 +443,6 @@ body {
 }
 
 /* Responsive Styles */
-@media (max-width: 768px) {
-    body {
-        padding: 8px;
-    }
-
-    .logo {
-        font-size: 1.8rem;
-        margin-bottom: 4px;
-    }
-
-    .game-container {
-        flex-direction: column;
-        align-items: center;
-        gap: 12px;
-    }
-
-    .desktop-only {
-        display: none;
-    }
-
-    .mobile-only {
-        display: block;
-    }
-
-    .sidebar {
-        flex-direction: row;
-        width: 300px;
-        justify-content: space-between;
-    }
-
-    .sidebar-left {
-        order: 1;
-        width: 300px;
-        justify-content: center;
-    }
-
-    .preview-panel {
-        padding: 8px;
-    }
-
-    .board-column {
-        order: 2;
-    }
-
-    .sidebar-right {
-        order: 3;
-        flex-direction: column;
-        width: 300px;
-    }
-
-    .stats-panel {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        padding: 10px;
-    }
-}
 
 /* Mode Navigation */
 .mode-nav {
@@ -790,3 +734,140 @@ body {
     margin-top: 6px;
     align-self: center;
 }
+
+/* ===== Mobile Layout (<= 768px) =====
+   盤面と操作ボタンを1画面に収める。
+   - 盤面は画面の高さと幅の小さい方に合わせて縮む
+   - HOLD / NEXT / スコア / 相手盤面は右の細い列に並べる
+   - 操作ボタンは画面下に固定する
+   ファイル末尾に置くのは、上にある同じセレクタのPC用ルールに上書きされないため。 */
+@media (max-width: 768px) {
+    :root {
+        --m-header: 64px;
+        --m-controls: 150px;
+        --m-side: 92px;
+    }
+
+    body {
+        padding: 6px 6px var(--m-controls);
+        min-height: 100dvh;
+        overscroll-behavior: none;
+    }
+
+    .game-header { margin-bottom: 6px; }
+    .logo { font-size: 1.3rem; letter-spacing: 2px; margin-bottom: 4px; }
+    .mode-nav { margin-top: 0; gap: 8px; }
+    .mode-btn { font-size: 0.7rem; padding: 5px 12px; letter-spacing: 1px; }
+
+    .desktop-only { display: none; }
+
+    /* 左右のサイドバーは枠を外し、中身を直接グリッドに並べる */
+    .sidebar { display: contents; }
+
+    .game-container {
+        display: grid;
+        grid-template-columns: auto var(--m-side);
+        justify-content: center;
+        align-items: start;
+        column-gap: 8px;
+        row-gap: 6px;
+        max-width: 100%;
+    }
+
+    /* 盤面: 高さは「画面の残り」と「横幅に収まる高さ」の小さい方（最低200px） */
+    .board-column {
+        grid-column: 1;
+        grid-row: 1 / span 6;
+    }
+
+    .player-label-bar { margin-bottom: 3px; }
+    .player-tag { font-size: 0.6rem; padding: 1px 8px; }
+
+    .board-with-meter { gap: 4px; }
+    .garbage-meter-container { width: 8px; }
+
+    #board {
+        --board-h: max(200px, min(
+            calc(100dvh - var(--m-header) - var(--m-controls) - 40px),
+            calc((100vw - var(--m-side) - 12px - 12px - 12px - 16px) * 2)
+        ));
+        height: var(--board-h);
+        width: auto;
+        aspect-ratio: 1 / 2;
+    }
+
+    /* 右の列: 上から 相手 → HOLD → NEXT → スコア → SOUND/PAUSE */
+    .opponent-column { grid-column: 2; grid-row: 1; }
+    .sidebar-left > .preview-panel { grid-column: 2; grid-row: 2; }
+    .sidebar-right > .preview-panel { grid-column: 2; grid-row: 3; }
+    .stats-panel { grid-column: 2; grid-row: 4; }
+    .action-bar { grid-column: 2; grid-row: 5; }
+
+    .glass-panel { padding: 6px; border-radius: 8px; }
+    .panel-header { font-size: 0.6rem; letter-spacing: 1px; margin-bottom: 4px; }
+    .key-hint { display: none; }
+    .preview-panel .canvas-wrapper { padding: 2px; }
+    .preview-panel canvas { width: 64px; height: 64px; }
+
+    .stats-panel {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+    .stat-label { font-size: 0.55rem; letter-spacing: 1px; }
+    .stat-value { font-size: 0.95rem; }
+
+    .opponent-panel { padding: 6px; gap: 4px; }
+    #opponent-board { width: 64px; height: 128px; }
+    .opponent-board-wrapper { border-width: 1px; border-radius: 6px; }
+
+    .action-bar { flex-direction: column; gap: 4px; }
+    .icon-btn { font-size: 0.6rem; padding: 6px 2px; letter-spacing: 0; }
+
+    /* 操作ボタンは画面下に固定（盤面と同時に見える） */
+    .controls-container {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 50;
+        margin: 0;
+        padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
+        background: rgba(7, 9, 15, 0.92);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-top: 1px solid var(--panel-border);
+        display: block;
+    }
+    .controls-grid { gap: 6px; max-width: 420px; margin: 0 auto; }
+    .btn {
+        height: 46px;
+        touch-action: manipulation;
+    }
+    .btn-wide { height: 38px; }
+
+    .overlay-title { font-size: 1.3rem; }
+    .countdown-text { font-size: 3.5rem; }
+}
+
+/* 背の低いスマホ（iPhone SE など）: 右列を詰めて、スコアと SOUND/PAUSE が操作ボタンの下に隠れないようにする */
+@media (max-width: 768px) and (max-height: 760px) {
+    :root { --m-controls: 140px; }
+
+    .sidebar-left > .preview-panel .panel-header,
+    .sidebar-right > .preview-panel .panel-header { display: none; }
+    .preview-panel canvas { width: 48px; height: 48px; }
+    #opponent-board { width: 48px; height: 96px; }
+
+    .stats-panel {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2px;
+    }
+    .stat-value { font-size: 0.8rem; }
+
+    .btn { height: 42px; }
+    .btn-wide { height: 34px; }
+    .controls-container { padding-top: 6px; }
+}
+
